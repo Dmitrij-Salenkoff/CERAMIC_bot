@@ -38,14 +38,7 @@ def sql_start():
     base.execute(' CREATE TABLE IF NOT EXISTS pottery ('
                  ' id_com INTEGER PRIMARY KEY AUTOINCREMENT,'
                  ' id TEXT NOT NULL,'
-                 ' date TEXT,'
-                 ' name TEXT,'
-                 ' photo TEXT,'
-                 ' phone_number TEXT,'
-                 ' price TEXT,'
-                 ' time_start TEXT,'
-                 ' time_end TEXT,'
-                 ' type TEXT'
+                 ' descr TEXT'
                  ')'
                  )
 
@@ -70,20 +63,16 @@ def sql_start():
 
 async def sql_add_command(state):
     async with state.proxy() as data:
-        cur.execute('INSERT INTO pottery(id, photo, phone_number, price, '
-                    'time_start, time_end, name, type, date) '
-                    'VALUES (?, ?, ?, ?, ?, ?, ?, ? , ?)',
-                    tuple(data.values()))
+        cur.execute('INSERT INTO pottery(id, descr) '
+                    'VALUES (?, ?)',
+                    (data['id'], data['descr']))
         base.commit()
 
 
 async def sql_find_id(message: types.Message) -> bool:
     if len(cur.execute(f'SELECT * FROM pottery WHERE id = (?)', (message.text,)).fetchall()) > 0:
         for ret in cur.execute(f'SELECT * FROM pottery WHERE id = (?)', (message.text,)).fetchall():
-            rep, photo_id = reply_template(ret, columns=['id', 'date', 'name', 'photo'], cur=cur)
-            if photo_id:
-                await message.reply_photo(photo_id, reply=False)
-            await message.reply(rep, reply=False)
+            await message.reply('Изделие найдено!', reply=False)
             return True
     else:
         await message.reply('Таких изделий нет', reply=False)

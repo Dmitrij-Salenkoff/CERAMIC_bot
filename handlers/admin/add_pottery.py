@@ -53,14 +53,12 @@ async def add_photo(message: types.Message, state: FSMContext):
 
 async def add_info(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
-        dict_info = info_to_dict(message.text)
-        data.update(dict_info)
+        data['descr'] = message.text
+        data.update(data)
 
     reply = f'Информация о работе: \n\n' \
             f'Номер изделия: {data["id"]} \n' \
-            f'Имя автора: {data["name"]} \n' \
-            f'Дата изготовления: {data["date"]} \n' \
-            f'Тип изделия: {data["type"]}'
+            f'Строчка из гугла: {data["descr"]}'
 
     if data['photo'] == '-':
         await message.reply(reply + f'\nФото нет', reply=False, reply_markup=adkb.kb_admin_save)
