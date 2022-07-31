@@ -2,7 +2,7 @@ import sqlite3 as sq
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import BoundFilter, Filter
+from aiogram.dispatcher.filters import BoundFilter
 
 from config import ADMINS_ID
 from create_bot import bot
@@ -38,7 +38,8 @@ def sql_start():
     base.execute(' CREATE TABLE IF NOT EXISTS pottery ('
                  ' id_com INTEGER PRIMARY KEY AUTOINCREMENT,'
                  ' id TEXT NOT NULL,'
-                 ' descr TEXT'
+                 ' descr TEXT,'
+                 ' photo_id'
                  ')'
                  )
 
@@ -63,16 +64,23 @@ def sql_start():
 
 async def sql_add_command(state):
     async with state.proxy() as data:
-        cur.execute('INSERT INTO pottery(id, descr) '
-                    'VALUES (?, ?)',
-                    (data['id'], data['descr']))
+        cur.execute('INSERT INTO pottery(id, descr, photo_id) '
+                    'VALUES (?, ?, ?)',
+                    (data['id'], data['descr'], data['photo_id']))
         base.commit()
 
 
-async def sql_find_id(message: types.Message) -> bool:
+async def sql_find_id(message: types.Message, photo=False) -> bool:
     if len(cur.execute(f'SELECT * FROM pottery WHERE id = (?)', (message.text,)).fetchall()) > 0:
         for ret in cur.execute(f'SELECT * FROM pottery WHERE id = (?)', (message.text,)).fetchall():
-            await message.reply('Изделие найдено!', reply=False)
+            rep = f'Номер изделия: {ret[1]}\n' \
+                  f'Информация: {ret[2]}'
+            if photo:
+                if len(ret)>=3:
+                    await message.reply_photo(ret[3], reply=False)
+                else:
+                    rep += '\nФото нет'
+            await message.reply(rep, reply=False)
             return True
     else:
         await message.reply('Таких изделий нет', reply=False)
@@ -119,6 +127,13 @@ async def sql_add_pottery_client(message: types.Message):
     else:
         cur.execute(f'INSERT INTO clients_pottery(client_id_tg, id) VALUES (?, ?)',
                     tuple([message.chat.id, message.text]))
+        for ret in cur.execute('SELECT * FROM pottery WHERE id=(?)', (message.text,)).fetchall():
+            rep = f'Номер изделия: {ret[1]}\n'
+            if ret[3] != '-':
+                await message.reply_photo(ret[3], reply=False)
+            else:
+                rep += '\nФото нет'
+            await message.reply(rep, reply=False)
         base.commit()
         await message.reply('Изделие успешно добавлено в ваш список изделий!', reply=False)
 

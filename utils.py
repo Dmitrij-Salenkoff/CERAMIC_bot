@@ -45,11 +45,11 @@ def reply_template(row, columns, cur):
         rep += f'\nДата изготовления: {reply_arr["date"]}'
 
     photo_id = False
-    if 'photo' in columns:
-        if reply_arr['photo'] == '-':
+    if 'photo_id' in columns:
+        if reply_arr['photo_id'] == '-':
             rep += '\n\nФото нет'
         else:
-            photo_id = reply_arr['photo']
+            photo_id = reply_arr['photo_id']
 
     return rep, photo_id
 

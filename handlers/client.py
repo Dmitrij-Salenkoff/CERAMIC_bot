@@ -1,13 +1,13 @@
 from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ContentType
+from aiogram.types import ContentType
 
-from config import password, ADMINS_ID
+from config import password
 from create_bot import dp
 from data_Base.database import sql_add_pottery_client, sql_client_find, sql_add_admin, sql_del_pottery
-from utils import find_name_phone
 from keyboards.admin_kb import kb_admin
+from utils import find_name_phone
 
 
 class AddPotteryClient(StatesGroup):

@@ -1,5 +1,4 @@
-from aiogram.types import ReplyKeyboardRemove, \
-    ReplyKeyboardMarkup, KeyboardButton, \
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, \
     InlineKeyboardMarkup, InlineKeyboardButton
 
 
@@ -13,6 +12,7 @@ kb_admin = InlineKeyboardMarkup()
 b1 = InlineKeyboardButton(text='Добавить изделие', callback_data='add_pottery')
 b2 = InlineKeyboardButton(text='Сообщить о готовности', callback_data='complete_pottery')
 b3 = InlineKeyboardButton(text='Найти изделие', callback_data='find_pottery')
+
 b5 = InlineKeyboardButton(text='Список админов', callback_data='menu_admins_list')
 b6 = InlineKeyboardButton(text='Добавить админа', callback_data='menu_add_admin')
 # kb_admin.row(b1).row(b3, b2).row(b5, b6)

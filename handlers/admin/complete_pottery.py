@@ -13,7 +13,7 @@ class ChangePottery(StatesGroup):
     accept = State()
 
 
-@dp.callback_query_handler(text='complete_pottery', state=None)
+@dp.callback_query_handler(text='complete_pottery', state=None, chat_id=ADMINS_ID)
 async def change_stage(callback: types.CallbackQuery, state: FSMContext):
     await ChangePottery.id.set()
     await callback.message.reply('Введите номер изделия:', reply=False)
@@ -43,7 +43,7 @@ async def change_id(message: types.Message, state: FSMContext):
         await state.finish()
 
 
-@dp.callback_query_handler(text='complete_yes', state=ChangePottery.accept)
+@dp.callback_query_handler(text='complete_yes', state=ChangePottery.accept, chat_id=ADMINS_ID)
 async def complete_yes(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         await sql_complete_pottery(state, data=data)
@@ -52,6 +52,6 @@ async def complete_yes(callback: types.CallbackQuery, state: FSMContext):
 
 
 def register_handlers_admin_change(dp_in: Dispatcher):
-    dp_in.register_message_handler(change_id, state=ChangePottery.id)
+    dp_in.register_message_handler(change_id, state=ChangePottery.id, chat_id=ADMINS_ID)
 
-    dp_in.register_message_handler(change_stage, state=ChangePottery.accept)
+    dp_in.register_message_handler(change_stage, state=ChangePottery.accept, chat_id=ADMINS_ID)

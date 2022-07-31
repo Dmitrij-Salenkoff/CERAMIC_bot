@@ -17,14 +17,14 @@ class AddPottery(StatesGroup):
     save = State()
 
 
-@dp.callback_query_handler(text='add_pottery', state=None)
+@dp.callback_query_handler(text='add_pottery', state=None, chat_id=ADMINS_ID)
 async def add_pottery_state(callback: types.CallbackQuery, state: FSMContext):
     await AddPottery.id.set()
     await callback.message.reply('Введи номер изделия', reply=False)
     await callback.answer()
 
 
-@dp.callback_query_handler(text='add_pottery', state="*")
+@dp.callback_query_handler(text='add_pottery', state="*", chat_id=ADMINS_ID)
 async def add_pottery_state(callback: types.CallbackQuery, state: FSMContext):
     await callback.answer()
 
@@ -46,7 +46,7 @@ async def add_skip_photo(message: types.Message, state: FSMContext):
 
 async def add_photo(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
-        data['photo'] = message.photo[0].file_id
+        data['photo_id'] = message.photo[0].file_id
     await AddPottery.info.set()
     await message.reply('Отправьте данные из гугл-календаря', reply=False)
 
@@ -60,15 +60,15 @@ async def add_info(message: types.Message, state: FSMContext):
             f'Номер изделия: {data["id"]} \n' \
             f'Строчка из гугла: {data["descr"]}'
 
-    if data['photo'] == '-':
+    if data['photo_id'] == '-':
         await message.reply(reply + f'\nФото нет', reply=False, reply_markup=adkb.kb_admin_save)
     else:
-        await message.reply_photo(data['photo'], reply=False)
+        # await message.reply_photo(data['photo_id'], reply=False)
         await message.reply(reply, reply=False, reply_markup=adkb.kb_admin_save)
     await AddPottery.save.set()
 
 
-@dp.callback_query_handler(text='save_pottery', state=AddPottery.save)
+@dp.callback_query_handler(text='save_pottery', state=AddPottery.save, chat_id=ADMINS_ID)
 async def add_save(callback: types.CallbackQuery, state: FSMContext):
     await sql_add_command(state)
     await callback.message.reply('Изделие добавлено!', reply=False)
@@ -77,7 +77,7 @@ async def add_save(callback: types.CallbackQuery, state: FSMContext):
     await state.finish()
 
 
-@dp.callback_query_handler(text='reset_pottery', state=AddPottery.save)
+@dp.callback_query_handler(text='reset_pottery', state=AddPottery.save, chat_id=ADMINS_ID)
 async def add_reset(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.reply('Изделие удалено!', reply=False)
     await callback.message.reply('Выберите, что хотите сделать:', reply_markup=adkb.kb_admin, reply=False)
@@ -86,9 +86,9 @@ async def add_reset(callback: types.CallbackQuery, state: FSMContext):
 
 
 def register_handlers_admin_add_pottery(dp_in: Dispatcher):
-    dp_in.register_message_handler(add_id, regexp=r"\d", state=AddPottery.id)
+    dp_in.register_message_handler(add_id, regexp=r"\d", state=AddPottery.id, chat_id=ADMINS_ID)
 
-    dp_in.register_message_handler(add_skip_photo, commands=['skip'], state=AddPottery.photo)
-    dp_in.register_message_handler(add_photo, state=AddPottery.photo, content_types=ContentType.PHOTO)
+    dp_in.register_message_handler(add_skip_photo, commands=['skip'], state=AddPottery.photo, chat_id=ADMINS_ID)
+    dp_in.register_message_handler(add_photo, state=AddPottery.photo, content_types=ContentType.PHOTO, chat_id=ADMINS_ID)
 
-    dp_in.register_message_handler(add_info, state=AddPottery.info, content_types=ContentType.TEXT)
+    dp_in.register_message_handler(add_info, state=AddPottery.info, content_types=ContentType.TEXT, chat_id=ADMINS_ID)
