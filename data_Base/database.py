@@ -31,7 +31,7 @@ class IsAdmin(BoundFilter):
 
 def sql_start():
     global base, cur
-    base = sq.connect('data_base.db')
+    base = sq.connect('data/data_base.db')
     cur = base.cursor()
     if base:
         print('Database connected \n OK!')
